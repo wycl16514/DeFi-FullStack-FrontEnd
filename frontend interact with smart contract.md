@@ -44,4 +44,16 @@ async function main() {
 }
 ```
 
-After having aboved changes, run "npx hardhat run script/deploy.js", then we will see at path ./src/frontend/contracts/, there are two files with name SimpleDefiToken-address.json and SimpleDefiToken.json,
+After having aboved changes, run "npx hardhat run script/deploy.js", then we will see at path ./src/frontend/contracts/, there are two files with name SimpleDefiToken-address.json and SimpleDefiToken.json, and they will save
+related info for later usage.
+
+When frontend want to interact with smart contract, it first need to get adress and abi of the smart contract, then it need to use wallet as medium to connect with smart contract. The architechture would like following:
+
+
+![DeFi-frontend (1)](https://github.com/user-attachments/assets/31c2172b-fe50-4f53-8dbe-26d33a7c188d)
+
+From aboved image we can see, the frontend application can't connect to blockchain network directly, all interaction with smart contract will deligate to wallet such as authentication, and wallets are not directly interact with
+smart contract, they rely on connector to deligate their requests, different wallet may choose different connector, connector will deligate its request to provider and provider will rely on rpc endpoint to send messages to 
+smart contract on the blockchain networks.
+
+Why create such layers, that's because to meet all kinds of complicate business concers, we will put them here and go back to it at later time.
