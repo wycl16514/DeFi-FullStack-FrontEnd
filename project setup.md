@@ -12,8 +12,8 @@ Since we are fullstack, we will hanlde all those jobs by ourself. In this sectio
 interact with smart contract by using those meta data save at file. First we will see how to write the meta deta of smart contract deployment into file. There are two kinds of meta data we need to send to frontend, one is 
 smart contract ABI, the other is the deployed address of the smart contract.
 
-Since the ABI of the smart contract is saved at the compiled result file in the artifacts folder, and we can get the deployed address from the deploy script, then we can write these two kinds of info local file, which is located
-at the path of ./src/frontend/contracts, then we create a frontend/contracts folder at the src path first and change the deploy.js as following:
+Since the ABI of the smart contract is saved at the compiled result file in the artifacts folder, and we can get the deployed address from the deploy script, then we can write these two kinds of info local file, which is 
+located at the path of ./src/frontend/contracts, then we create a frontend/contracts folder at the src path first and change the deploy.js as following:
 
 ```js
 function savedContractToFrontend(contract, name) {
@@ -56,4 +56,73 @@ From aboved image we can see, the frontend application can't connect to blockcha
 smart contract, they rely on connector to deligate their requests, different wallet may choose different connector, connector will deligate its request to provider and provider will rely on rpc endpoint to send messages to 
 smart contract on the blockchain networks.
 
-Why create such layers, that's because to meet all kinds of complicate business concers, we will put them here and go back to it at later time.
+Why create such layers, that's because to meet all kinds of complicate business concers, we will put them here and go back to it at later time. Before we going to start our new project, we need to install packages by following
+command:
+```js
+npm i @ethersproject/providers
+npm i @web3-react/core@6.19
+npm i @web3-react/injected-connector
+```
+
+Then in App.js, we change its code a little bit as following:
+```js
+import logo from './logo.svg';
+import './App.css';
+import { Web3ReactProvider } from '@web3-react/core'
+import { getLibrary } from './components/wallet';
+function App() {
+  return (
+    <Web3ReactProvider getLibrary={getLibrary}>
+      <div className="App">
+        <header className="App-header">
+          <img src={logo} className="App-logo" alt="logo" />
+          <p>
+            Edit <code>src/App.js</code> and save to reload.
+          </p>
+          <a
+            className="App-link"
+            href="https://reactjs.org"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Learn React
+          </a>
+        </header>
+      </div>
+    </Web3ReactProvider >
+  );
+}
+
+export default App;
+
+```
+Then run npm start, if you can see the page bring up successfully then our code configuration is ok. Now it is time to inject connector, in index.js we add following:
+```js
+import { InjectedConnector } from "@web3-react/injected-connector"
+
+export const ETHEREUM_NETWORK_ID = 1
+export const SEPOLIA_NETWORK_ID = 11155111;
+export const LOCAL_NETWORK_ID = 31337
+
+export const injectedConnector = new InjectedConnector({
+    supportedChainIds: [
+        ETHEREUM_NETWORK_ID,
+        SEPOLIA_NETWORK_ID,
+        LOCAL_NETWORK_ID,
+    ]
+})
+
+...
+```
+
+Then start the hardhat local network, and open your metamask plugin, click the three points at the right top, click setting, click network, click add new network, in the popup page, click "add network by hand", in the following
+page, fill in following setting:
+
+![截屏2024-08-22 12 59 45](https://github.com/user-attachments/assets/064e2b0d-6478-40a1-a946-b7514f0bcd45)
+
+Then click the up left corner button to switch current network to hardhat, and click button at the middle to add a new account, and select import account, go to the hardhat console, copy an account private key and past to it,
+click ok then you will see the given account is import into metamask:
+
+![截屏2024-08-22 13 02 43](https://github.com/user-attachments/assets/476106d6-902f-48e8-8383-52eabf3ddb4b)
+
+All aboved steps process normally, we can go to the development stage.
